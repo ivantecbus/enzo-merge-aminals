@@ -52,7 +52,8 @@ body {
   position: absolute;
   top: 0px;
   left: 0px;
-  font-size: clamp(20px, 5vw, 40px);
+  font-size: clamp(7vh, 5vw, 40px);
+  object-fit: cover; /* Adicionado para ajustar a imagem */
 }
 
 /* Responsividade para dispositivos móveis */
@@ -179,4 +180,14 @@ button {
 button:disabled {
   background: #555;
   cursor: not-allowed;
+}
+button {
+  background: #0080ff;
+  border: none;
+  padding: 70px 100px; /* Aumentado */
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
 }
