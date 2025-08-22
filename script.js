@@ -168,8 +168,8 @@ function calculateBattlePower() {
   let power = 0;
   for (let i = 0; i < grid.length; i++) {
     if (grid[i] !== null) {
-      // Poder = 10 * (2^nível) - considera o peso exponencial
-      power += 10 * Math.pow(2, grid[i]);
+      // Poder = 2^nível (1, 2, 4, 8, 16, ...)
+      power += Math.pow(2, grid[i]);
     }
   }
   return power;
@@ -178,10 +178,14 @@ function calculateBattlePower() {
 function startBattle() {
   const power = calculateBattlePower();
   
-  logMessage(`Poder total da batalha: ${power}`);
+  // Contar o número total de animais no grid
+  const totalAnimals = grid.filter(slot => slot !== null).length;
   
-  // Recompensa baseada no poder (ajustada para nova escala mais equilibrada)
-  const reward = Math.floor(power / 20); // Reduzido de /10 para /20
+  logMessage(`Poder total da batalha: ${power}`);
+  logMessage(`Animais na batalha: ${totalAnimals}`);
+  
+  // Recompensa: igual ao poder total (soma dos poderes individuais)
+  const reward = power;
   moedas += reward;
   updateMoedas();
   

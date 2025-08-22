@@ -42,7 +42,7 @@ body {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(8, 1fr);
-  gap: clamp(2px, 1vw, 8px); /* Gap mais flexível */
+  gap: clamp(1px, 0.6vw, 4px); /* Gap reduzido */
   margin-bottom: clamp(8px, 2vh, 15px);
   aspect-ratio: 5/8; /* Padrão para orientação vertical */
   width: min(92vw, 500px); /* Largura mais adaptável */
@@ -63,6 +63,7 @@ body {
     aspect-ratio: 8/5; /* Proporção invertida para landscape */
     width: min(85vw, 700px); /* Largura maior para aproveitar o espaço horizontal */
     max-height: 60vh;
+    gap: clamp(1px, 0.5vw, 3px); /* Gap reduzido para landscape */
   }
 }
 .slot {
@@ -114,7 +115,7 @@ body {
     aspect-ratio: 5/8;
     width: min(88vw, 420px);
     max-height: 65vh;
-    gap: clamp(2px, 0.8vw, 5px);
+    gap: clamp(1px, 0.5vw, 3px); /* Gap reduzido */
     padding: clamp(2px, 0.6vw, 4px);
   }
   
@@ -144,7 +145,7 @@ body {
     aspect-ratio: 8/5;
     width: min(85vw, 650px);
     max-height: 65vh;
-    gap: clamp(3px, 1vw, 7px);
+    gap: clamp(1px, 0.6vw, 4px); /* Gap reduzido */
     padding: clamp(3px, 0.8vw, 6px);
   }
   
@@ -218,7 +219,7 @@ body {
     aspect-ratio: 8/5;
     width: min(88vw, 480px);
     max-height: 45vh;
-    gap: clamp(1px, 0.4vw, 3px);
+    gap: clamp(1px, 0.2vw, 2px); /* Gap muito reduzido */
     padding: clamp(1px, 0.3vw, 2px);
   }
   
@@ -289,7 +290,7 @@ body {
     aspect-ratio: 8/5;
     width: min(90vw, 320px);
     max-height: 40vh;
-    gap: clamp(1px, 0.2vw, 1px);
+    gap: clamp(0.5px, 0.1vw, 1px); /* Gap mínimo */
     padding: clamp(1px, 0.1vw, 1px);
   }
   
@@ -310,7 +311,7 @@ body {
   #grid {
     width: min(85vw, 450px);
     max-height: 60vh;
-    gap: clamp(2px, 0.8vw, 6px);
+    gap: clamp(1px, 0.5vw, 3px); /* Gap reduzido */
     padding: clamp(2px, 0.6vw, 4px);
   }
   
@@ -349,7 +350,7 @@ body {
     aspect-ratio: 5/8;
     width: min(60vw, 500px);
     max-height: 75vh;
-    gap: clamp(4px, 1.2vw, 10px);
+    gap: clamp(2px, 0.8vw, 6px); /* Gap reduzido */
     padding: clamp(4px, 1vw, 8px);
   }
   
@@ -384,7 +385,7 @@ body {
     aspect-ratio: 8/5;
     width: min(80vw, 800px);
     max-height: 70vh;
-    gap: clamp(4px, 1.2vw, 10px);
+    gap: clamp(2px, 0.8vw, 6px); /* Gap reduzido */
     padding: clamp(4px, 1vw, 8px);
   }
   
