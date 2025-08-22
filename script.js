@@ -13,7 +13,7 @@ const restartBtn = document.getElementById('restartBtn');
 const gridEl = document.getElementById('grid');
 const logMessages = document.getElementById('logMessages');
 
-let moedas = 100500;
+let moedas = 500;
 let selectedGemini = null;
 let grid = Array(40).fill(null);
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
