@@ -1,5 +1,11 @@
 const moedasEl = document.getElementById('moedas');
-const buyBtn = document.getElementById('buyGeminiBtn');
+const buy1Btn = document.getElementById('buy1Btn');
+const buy2Btn = document.getElementById('buy2Btn');
+const buy3Btn = document.getElementById('buy3Btn');
+const buy4Btn = document.getElementById('buy4Btn');
+const buy5Btn = document.getElementById('buy5Btn');
+const buy6Btn = document.getElementById('buy6Btn');
+const buy7Btn = document.getElementById('buy7Btn');
 const battleBtn = document.getElementById('battleBtn');
 const restartBtn = document.getElementById('restartBtn');
 const gridEl = document.getElementById('grid');
@@ -9,6 +15,9 @@ let moedas = 500;
 let selectedGemini = null;
 let grid = Array(40).fill(null);
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
+
+// Custos progressivos (duplicando a cada nível)
+const buyCosts = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200, 1638400, 3276800, 6553600, 13107200, 26214400, 52428800];
 
 // Cores para cada nível
 const colors = [
@@ -20,7 +29,17 @@ const colors = [
 
 function updateMoedas() {
   moedasEl.textContent = `Moedas: ${moedas}`;
-  buyBtn.disabled = moedas < 100;
+  
+  const emptySlots = grid.filter(slot => slot === null).length;
+  
+  // Atualizar estado de cada botão baseado em moedas e espaços disponíveis
+  buy1Btn.disabled = moedas < buyCosts[0] || emptySlots < 1; // 🐜 (100)
+  buy2Btn.disabled = moedas < buyCosts[1] || emptySlots < 1; // 🐛 (200)
+  buy3Btn.disabled = moedas < buyCosts[2] || emptySlots < 1; // 🦂 (400)
+  buy4Btn.disabled = moedas < buyCosts[3] || emptySlots < 1; // 🕷️ (800)
+  buy5Btn.disabled = moedas < buyCosts[4] || emptySlots < 1; // 🐍 (1600)
+  buy6Btn.disabled = moedas < buyCosts[5] || emptySlots < 1; // 🦎 (3200)
+  buy7Btn.disabled = moedas < buyCosts[6] || emptySlots < 1; // 🐸 (6400)
 }
 
 function getGeminiColor(level) {
@@ -74,29 +93,51 @@ function selectGemini(gemini) {
   }
 }
 
-function buyGemini() {
-  if (moedas >= 100) {
-    const emptySlots = [];
-    for (let i = 0; i < grid.length; i++) {
-      if (grid[i] === null) emptySlots.push(i);
-    }
-    
-    if (emptySlots.length > 0) {
-      const randomIndex = emptySlots[Math.floor(Math.random() * emptySlots.length)];
-      grid[randomIndex] = 0;
-      
-      const gemini = createGemini(0, randomIndex);
-      gridEl.children[randomIndex].appendChild(gemini);
-      
-      moedas -= 100;
-      updateMoedas();
-      
-      // Atualizar log com novo poder
-      const newPower = calculateBattlePower();
-      logMessage(`Formiga comprada! Novo poder: ${newPower}`);
-    }
+function buyGemini(cost, level, quantity, geminiName) {
+  const emptySlots = [];
+  for (let i = 0; i < grid.length; i++) {
+    if (grid[i] === null) emptySlots.push(i);
   }
+  
+  if (emptySlots.length < quantity) {
+    logMessage(`Não há espaços suficientes para ${geminiName}!`);
+    return;
+  }
+  
+  if (moedas < cost) {
+    logMessage(`Moedas insuficientes para ${geminiName}!`);
+    return;
+  }
+  
+  // Realizar a compra
+  moedas -= cost;
+  
+  for (let i = 0; i < quantity; i++) {
+    const randomIndex = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+    grid[randomIndex] = level;
+    
+    const gemini = createGemini(level, randomIndex);
+    gridEl.children[randomIndex].appendChild(gemini);
+    
+    // Remover o slot usado da lista de slots vazios
+    emptySlots.splice(emptySlots.indexOf(randomIndex), 1);
+  }
+  
+  updateMoedas();
+  
+  // Atualizar log com novo poder
+  const newPower = calculateBattlePower();
+  logMessage(`${geminiName} comprado! Novo poder: ${newPower}`);
 }
+
+// Funções específicas para cada botão (cada uma compra um nível específico)
+function buy1Formiga() { buyGemini(buyCosts[0], 0, 1, geminiLevels[0]); } // 🐜 (100)
+function buy2Lagarta() { buyGemini(buyCosts[1], 1, 1, geminiLevels[1]); } // 🐛 (200)
+function buy3Escorpiao() { buyGemini(buyCosts[2], 2, 1, geminiLevels[2]); } // 🦂 (400)
+function buy4Aranha() { buyGemini(buyCosts[3], 3, 1, geminiLevels[3]); } // 🕷️ (800)
+function buy5Cobra() { buyGemini(buyCosts[4], 4, 1, geminiLevels[4]); } // 🐍 (1600)
+function buy6Lagarto() { buyGemini(buyCosts[5], 5, 1, geminiLevels[5]); } // 🦎 (3200)
+function buy7Sapo() { buyGemini(buyCosts[6], 6, 1, geminiLevels[6]); } // 🐸 (6400)
 
 function logMessage(message) {
   const logMessages = document.getElementById('logMessages');
@@ -133,8 +174,8 @@ function startBattle() {
   
   logMessage(`Poder total da batalha: ${power}`);
   
-  // Recompensa baseada no poder (ajustada para nova escala)
-  const reward = Math.floor(power / 10);
+  // Recompensa baseada no poder (ajustada para nova escala mais equilibrada)
+  const reward = Math.floor(power / 20); // Reduzido de /10 para /20
   moedas += reward;
   updateMoedas();
   
@@ -207,7 +248,13 @@ function restartGame() {
 }
 
 // Event listeners
-buyBtn.addEventListener('click', buyGemini);
+buy1Btn.addEventListener('click', buy1Formiga);
+buy2Btn.addEventListener('click', buy2Lagarta);
+buy3Btn.addEventListener('click', buy3Escorpiao);
+buy4Btn.addEventListener('click', buy4Aranha);
+buy5Btn.addEventListener('click', buy5Cobra);
+buy6Btn.addEventListener('click', buy6Lagarto);
+buy7Btn.addEventListener('click', buy7Sapo);
 battleBtn.addEventListener('click', startBattle);
 restartBtn.addEventListener('click', restartGame);
 

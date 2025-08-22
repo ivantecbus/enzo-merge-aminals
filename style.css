@@ -10,6 +10,9 @@ body {
   user-select: none;
   min-height: 100vh;
   box-sizing: border-box;
+  touch-action: manipulation; /* Desabilita zoom no duplo clique */
+  -webkit-user-select: none; /* Desabilita seleção de texto no Safari */
+  -webkit-touch-callout: none; /* Desabilita menu de contexto no iOS */
 }
 #moedas {
   font-size: 1.5em;
@@ -24,6 +27,8 @@ body {
   aspect-ratio: 5/8;
   width: 100%;
   justify-content: center;
+  touch-action: manipulation; /* Previne zoom no duplo clique */
+  -webkit-touch-callout: none; /* Desabilita menu de contexto no iOS */
 }
 .slot {
   aspect-ratio: 1;
@@ -36,6 +41,8 @@ body {
   position: relative;
   min-width: 40px;
   min-height: 40px;
+  touch-action: manipulation; /* Previne zoom no duplo clique */
+  -webkit-touch-callout: none; /* Desabilita menu de contexto no iOS */
 }
 .gemini {
   width: 100%;
@@ -52,8 +59,9 @@ body {
   position: absolute;
   top: 0px;
   left: 0px;
-  font-size: clamp(7vh, 5vw, 40px);
-  object-fit: cover; /* Adicionado para ajustar a imagem */
+  font-size: 8vw; /* Tamanho totalmente responsivo baseado na largura da tela */
+  object-fit: cover;
+  box-sizing: border-box;
 }
 
 /* Responsividade para dispositivos móveis */
@@ -71,7 +79,7 @@ body {
   }
   
   .gemini {
-    font-size: clamp(16px, 4vw, 30px);
+    font-size: 10vw; /* Aumentado para ocupar melhor o espaço no mobile */
   }
   
   #moedas {
@@ -79,9 +87,10 @@ body {
   }
   
   button {
-    padding: 8px 16px;
-    font-size: 14px;
-    margin-right: 5px;
+    padding: 1.5vh 3vw; /* Ajustado para mobile */
+    font-size: 2.5vw; /* Ajustado para mobile */
+    margin-right: 2vw;
+    min-width: 60px;
   }
   
   #logArea {
@@ -104,7 +113,7 @@ body {
   }
   
   .gemini {
-    font-size: clamp(14px, 3.5vw, 24px);
+    font-size: 12vw; /* Aumentado para telas menores */
   }
   
   body {
@@ -119,9 +128,10 @@ body {
   
   button {
     margin-right: 0;
-    margin-bottom: 5px;
-    padding: 8px 12px;
-    font-size: 12px;
+    margin-bottom: 1vh;
+    padding: 1vh 2.5vw;
+    font-size: 3vw;
+    min-width: 50px;
   }
   
   #moedas {
@@ -144,7 +154,7 @@ body {
   }
   
   .gemini {
-    font-size: clamp(12px, 3vw, 20px);
+    font-size: 15vw; /* Totalmente proporcional para telas muito pequenas */
   }
   
   body {
@@ -166,28 +176,29 @@ body {
 }
 #controls {
   margin-bottom: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vh;
+  justify-content: center;
+  align-items: center;
 }
 button {
   background: #0080ff;
   border: none;
-  padding: 10px 20px;
+  padding: 1.5vh 2.5vw; /* Reduzido para caber mais botões */
   color: white;
   font-weight: bold;
   border-radius: 6px;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 1vw; /* Reduzido */
+  font-size: 1.8vw; /* Reduzido */
+  touch-action: manipulation; /* Previne zoom no duplo clique */
+  -webkit-touch-callout: none; /* Desabilita menu de contexto no iOS */
+  user-select: none; /* Desabilita seleção de texto */
+  -webkit-user-select: none; /* Desabilita seleção de texto no Safari */
+  min-width: 80px; /* Tamanho mínimo para legibilidade */
 }
 button:disabled {
   background: #555;
   cursor: not-allowed;
-}
-button {
-  background: #0080ff;
-  border: none;
-  padding: 70px 100px; /* Aumentado */
-  color: white;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-right: 10px;
 }
