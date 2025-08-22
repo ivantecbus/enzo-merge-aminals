@@ -14,7 +14,7 @@ const restartBtn = document.getElementById('restartBtn');
 const gridEl = document.getElementById('grid');
 const logMessages = document.getElementById('logMessages');
 
-let moedas = 1000;
+let moedas = loadMoedasFromCache() || 1000;
 let selectedGemini = null;
 let grid = Array(40).fill(null);
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
@@ -30,8 +30,39 @@ const colors = [
   '#FF1493', '#DC143C', '#B22222', '#8B0000', '#FF0000'
 ];
 
+// Funções para salvar/carregar moedas do cache
+function saveMoedasToCache() {
+  try {
+    localStorage.setItem('mergeAnimals_moedas', moedas.toString());
+  } catch (error) {
+    console.log('Erro ao salvar moedas:', error);
+  }
+}
+
+function loadMoedasFromCache() {
+  try {
+    const savedMoedas = localStorage.getItem('mergeAnimals_moedas');
+    return savedMoedas ? parseInt(savedMoedas) : null;
+  } catch (error) {
+    console.log('Erro ao carregar moedas:', error);
+    return null;
+  }
+}
+
+function clearCache() {
+  try {
+    localStorage.removeItem('mergeAnimals_moedas');
+    logMessage('Cache limpo com sucesso!');
+  } catch (error) {
+    console.log('Erro ao limpar cache:', error);
+  }
+}
+
 function updateMoedas() {
   moedasEl.textContent = `Moedas: ${moedas}`;
+  
+  // Salvar moedas no cache automaticamente
+  saveMoedasToCache();
   
   const emptySlots = grid.filter(slot => slot === null).length;
   
@@ -220,8 +251,19 @@ function initGrid() {
 }
 
 function restartGame() {
-  // Reset all values to initial state
-  moedas = 500;
+  // Perguntar se o usuário quer manter as moedas salvas
+  const keepMoedas = confirm('Deseja manter suas moedas salvas? (Cancelar = resetar para 1000 moedas)');
+  
+  if (!keepMoedas) {
+    moedas = 1000;
+    // Limpar cache se escolher resetar
+    try {
+      localStorage.removeItem('mergeAnimals_moedas');
+    } catch (error) {
+      console.log('Erro ao limpar cache:', error);
+    }
+  }
+  
   selectedGemini = null;
   grid = Array(40).fill(null);
   
@@ -277,3 +319,10 @@ restartBtn.addEventListener('click', restartGame);
 // Inicializar
 initGrid();
 updateMoedas();
+
+// Mostrar mensagem se moedas foram carregadas do cache
+if (loadMoedasFromCache()) {
+  logMessage(`Moedas carregadas do cache: ${moedas}`);
+} else {
+  logMessage('Novo jogo iniciado!');
+}
