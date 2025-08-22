@@ -8,12 +8,13 @@ const buy6Btn = document.getElementById('buy6Btn');
 const buy7Btn = document.getElementById('buy7Btn');
 const buy8Btn = document.getElementById('buy8Btn');
 const buy9Btn = document.getElementById('buy9Btn');
+const buy10Btn = document.getElementById('buy10Btn');
 const battleBtn = document.getElementById('battleBtn');
 const restartBtn = document.getElementById('restartBtn');
 const gridEl = document.getElementById('grid');
 const logMessages = document.getElementById('logMessages');
 
-let moedas = 500;
+let moedas = 5000000;
 let selectedGemini = null;
 let grid = Array(40).fill(null);
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
@@ -44,6 +45,7 @@ function updateMoedas() {
   buy7Btn.disabled = moedas < buyCosts[6] || emptySlots < 1; // 🐸 (6400)
   buy8Btn.disabled = moedas < buyCosts[7] || emptySlots < 1; // 🐟 (12800)
   buy9Btn.disabled = moedas < buyCosts[8] || emptySlots < 1; // 🐱 (25600)
+  buy10Btn.disabled = moedas < buyCosts[9] || emptySlots < 1; // 🐶 (51200)
 }
 
 function getGeminiColor(level) {
@@ -144,6 +146,7 @@ function buy6Lagarto() { buyGemini(buyCosts[5], 5, 1, geminiLevels[5]); } // �
 function buy7Sapo() { buyGemini(buyCosts[6], 6, 1, geminiLevels[6]); } // 🐸 (6400)
 function buy8Fish() { buyGemini(buyCosts[7], 7, 1, geminiLevels[7]); } // 🐟 (12800)
 function buy9Cat() { buyGemini(buyCosts[8], 8, 1, geminiLevels[8]); } // 🐱 (25600)
+function buy10Dog() { buyGemini(buyCosts[9], 9, 1, geminiLevels[9]); } // 🐶 (51200)
 
 function logMessage(message) {
   const logMessages = document.getElementById('logMessages');
@@ -267,6 +270,7 @@ buy6Btn.addEventListener('click', buy6Lagarto);
 buy7Btn.addEventListener('click', buy7Sapo);
 buy8Btn.addEventListener('click', buy8Fish);
 buy9Btn.addEventListener('click', buy9Cat); 
+buy10Btn.addEventListener('click', buy10Dog);
 battleBtn.addEventListener('click', startBattle);
 restartBtn.addEventListener('click', restartGame);
 
