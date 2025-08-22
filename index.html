@@ -4,7 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Merge Animals - por Enzo Davi</title>
-  <link rel="stylesheet" href="style.css" />
+  <script>
+    // Cache-busting automático: força recarregar CSS e JS sempre
+    const timestamp = new Date().getTime();
+    document.write('<link rel="stylesheet" href="style.css?v=' + timestamp + '" />');
+  </script>
+  <noscript>
+    <link rel="stylesheet" href="style.css?v=2025012300" />
+  </noscript>
 </head>
 <body>
   <div class="main-container">
@@ -32,6 +39,12 @@
   
   </div> <!-- fim main-container -->
 
-  <script src="script.js"></script>
+  <script>
+    // Cache-busting automático para JavaScript
+    const jsTimestamp = new Date().getTime();
+    const script = document.createElement('script');
+    script.src = 'script.js?v=' + jsTimestamp;
+    document.head.appendChild(script);
+  </script>
 </body>
 </html>
