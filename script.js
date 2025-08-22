@@ -6,12 +6,14 @@ const buy4Btn = document.getElementById('buy4Btn');
 const buy5Btn = document.getElementById('buy5Btn');
 const buy6Btn = document.getElementById('buy6Btn');
 const buy7Btn = document.getElementById('buy7Btn');
+const buy8Btn = document.getElementById('buy8Btn');
+const buy9Btn = document.getElementById('buy9Btn');
 const battleBtn = document.getElementById('battleBtn');
 const restartBtn = document.getElementById('restartBtn');
 const gridEl = document.getElementById('grid');
 const logMessages = document.getElementById('logMessages');
 
-let moedas = 500;
+let moedas = 100500;
 let selectedGemini = null;
 let grid = Array(40).fill(null);
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
@@ -40,6 +42,8 @@ function updateMoedas() {
   buy5Btn.disabled = moedas < buyCosts[4] || emptySlots < 1; // 🐍 (1600)
   buy6Btn.disabled = moedas < buyCosts[5] || emptySlots < 1; // 🦎 (3200)
   buy7Btn.disabled = moedas < buyCosts[6] || emptySlots < 1; // 🐸 (6400)
+  buy8Btn.disabled = moedas < buyCosts[7] || emptySlots < 1; // 🐟 (12800)
+  buy9Btn.disabled = moedas < buyCosts[8] || emptySlots < 1; // 🐱 (25600)
 }
 
 function getGeminiColor(level) {
@@ -138,6 +142,8 @@ function buy4Aranha() { buyGemini(buyCosts[3], 3, 1, geminiLevels[3]); } // 🕷
 function buy5Cobra() { buyGemini(buyCosts[4], 4, 1, geminiLevels[4]); } // 🐍 (1600)
 function buy6Lagarto() { buyGemini(buyCosts[5], 5, 1, geminiLevels[5]); } // 🦎 (3200)
 function buy7Sapo() { buyGemini(buyCosts[6], 6, 1, geminiLevels[6]); } // 🐸 (6400)
+function buy8Fish() { buyGemini(buyCosts[7], 7, 1, geminiLevels[7]); } // 🐟 (12800)
+function buy9Cat() { buyGemini(buyCosts[8], 8, 1, geminiLevels[8]); } // 🐱 (25600)
 
 function logMessage(message) {
   const logMessages = document.getElementById('logMessages');
@@ -255,6 +261,8 @@ buy4Btn.addEventListener('click', buy4Aranha);
 buy5Btn.addEventListener('click', buy5Cobra);
 buy6Btn.addEventListener('click', buy6Lagarto);
 buy7Btn.addEventListener('click', buy7Sapo);
+buy8Btn.addEventListener('click', buy8Fish);
+buy9Btn.addEventListener('click', buy9Cat); 
 battleBtn.addEventListener('click', startBattle);
 restartBtn.addEventListener('click', restartGame);
 
