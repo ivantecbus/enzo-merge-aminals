@@ -461,3 +461,103 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+/* Botões ocultos (não desbloqueados ainda) */
+button.hidden {
+  display: none !important;
+}
+
+/* Estilo para mensagem de tutorial/merge */
+.merge-tutorial {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+  color: white;
+  padding: clamp(20px, 5vw, 40px);
+  border-radius: clamp(15px, 3vw, 25px);
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  max-width: 90vw;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  animation: tutorialPulse 4s ease-in-out;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes tutorialPulse {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+}
+
+/* Popup de reinício do jogo */
+.restart-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(45deg, #FF4757, #5352ED, #3742FA, #2F3542);
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+  color: white;
+  font-weight: bold;
+  font-size: clamp(16px, 4vw, 22px);
+  padding: clamp(25px, 6vw, 35px);
+  border-radius: clamp(20px, 4vw, 30px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  z-index: 1001;
+  max-width: 85vw;
+  backdrop-filter: blur(15px);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.restart-popup-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.restart-popup-button {
+  padding: clamp(10px, 3vw, 15px) clamp(15px, 4vw, 25px);
+  border: none;
+  border-radius: clamp(8px, 2vw, 12px);
+  font-weight: bold;
+  font-size: clamp(14px, 3vw, 18px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: clamp(100px, 25vw, 140px);
+  backdrop-filter: blur(5px);
+}
+
+.restart-popup-button.keep {
+  background: linear-gradient(45deg, #2ECC71, #27AE60);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.restart-popup-button.reset {
+  background: linear-gradient(45deg, #E74C3C, #C0392B);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.restart-popup-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}

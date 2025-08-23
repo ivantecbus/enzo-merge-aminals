@@ -9,6 +9,16 @@ const buy7Btn = document.getElementById('buy7Btn');
 const buy8Btn = document.getElementById('buy8Btn');
 const buy9Btn = document.getElementById('buy9Btn');
 const buy10Btn = document.getElementById('buy10Btn');
+const buy11Btn = document.getElementById('buy11Btn');
+const buy12Btn = document.getElementById('buy12Btn');
+const buy13Btn = document.getElementById('buy13Btn');
+const buy14Btn = document.getElementById('buy14Btn');
+const buy15Btn = document.getElementById('buy15Btn');
+const buy16Btn = document.getElementById('buy16Btn');
+const buy17Btn = document.getElementById('buy17Btn');
+const buy18Btn = document.getElementById('buy18Btn');
+const buy19Btn = document.getElementById('buy19Btn');
+const buy20Btn = document.getElementById('buy20Btn');
 const battleBtn = document.getElementById('battleBtn');
 const restartBtn = document.getElementById('restartBtn');
 const gridEl = document.getElementById('grid');
@@ -18,6 +28,20 @@ let moedas = loadMoedasFromCache() || 1000;
 let selectedGemini = null;
 let grid = Array(40).fill(null);
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
+
+// Sistema de tutorial - controla quais merges já foram feitos
+let tutorialMerges = loadTutorialFromCache() || new Set();
+
+// Sistema de desbloqueio de botões - controla quais botões estão liberados
+let unlockedButtons = loadUnlockedButtonsFromCache() || new Set([0]); // Formiga sempre liberada
+
+// Nomes dos animais que são criados ao fazer merge
+const mergeNames = [
+  '🐛 Lagarta', '🦂 Escorpião', '🕷️ Aranha', '🐍 Cobra', '🦎 Lagarto', 
+  '🐸 Sapo', '🐟 Peixe', '🐱 Gato', '🐶 Cachorro', '🦁 Leão',
+  '🐅 Tigre', '🐻 Urso', '🐘 Elefante', '🦒 Girafa', '🦓 Zebra',
+  '🦛 Hipopótamo', '🦏 Rinoceronte', '🐴 Cavalo', '🐉 Dragão'
+];
 
 // Custos progressivos (duplicando a cada nível)
 const buyCosts = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200, 1638400, 3276800, 6553600, 13107200, 26214400, 52428800];
@@ -49,13 +73,251 @@ function loadMoedasFromCache() {
   }
 }
 
+function saveTutorialToCache() {
+  try {
+    localStorage.setItem('mergeAnimals_tutorial', JSON.stringify([...tutorialMerges]));
+  } catch (error) {
+    console.log('Erro ao salvar tutorial:', error);
+  }
+}
+
+function loadTutorialFromCache() {
+  try {
+    const savedTutorial = localStorage.getItem('mergeAnimals_tutorial');
+    return savedTutorial ? new Set(JSON.parse(savedTutorial)) : null;
+  } catch (error) {
+    console.log('Erro ao carregar tutorial:', error);
+    return null;
+  }
+}
+
+function saveUnlockedButtonsToCache() {
+  try {
+    localStorage.setItem('mergeAnimals_unlocked', JSON.stringify([...unlockedButtons]));
+  } catch (error) {
+    console.log('Erro ao salvar botões desbloqueados:', error);
+  }
+}
+
+function loadUnlockedButtonsFromCache() {
+  try {
+    const savedUnlocked = localStorage.getItem('mergeAnimals_unlocked');
+    return savedUnlocked ? new Set(JSON.parse(savedUnlocked)) : null;
+  } catch (error) {
+    console.log('Erro ao carregar botões desbloqueados:', error);
+    return null;
+  }
+}
+
+function saveGridToCache() {
+  try {
+    localStorage.setItem('mergeAnimals_grid', JSON.stringify(grid));
+  } catch (error) {
+    console.log('Erro ao salvar grid:', error);
+  }
+}
+
+function loadGridFromCache() {
+  try {
+    const savedGrid = localStorage.getItem('mergeAnimals_grid');
+    return savedGrid ? JSON.parse(savedGrid) : null;
+  } catch (error) {
+    console.log('Erro ao carregar grid:', error);
+    return null;
+  }
+}
+
 function clearCache() {
   try {
     localStorage.removeItem('mergeAnimals_moedas');
+    localStorage.removeItem('mergeAnimals_tutorial');
+    localStorage.removeItem('mergeAnimals_unlocked');
+    localStorage.removeItem('mergeAnimals_grid');
     logMessage('Cache limpo com sucesso!');
   } catch (error) {
     console.log('Erro ao limpar cache:', error);
   }
+}
+
+function hasSavedGame() {
+  try {
+    const savedMoedas = localStorage.getItem('mergeAnimals_moedas');
+    const savedGrid = localStorage.getItem('mergeAnimals_grid');
+    const savedUnlocked = localStorage.getItem('mergeAnimals_unlocked');
+    const savedTutorial = localStorage.getItem('mergeAnimals_tutorial');
+    
+    // Verificar se os dados são diferentes dos valores padrão
+    let hasRealProgress = false;
+    
+    // Verificar moedas (diferente de 1000)
+    if (savedMoedas && parseInt(savedMoedas) !== 1000) {
+      hasRealProgress = true;
+    }
+    
+    // Verificar grid (se tem animais além das 3 formigas iniciais ou animais evoluídos)
+    if (savedGrid) {
+      const gridData = JSON.parse(savedGrid);
+      const nonNullSlots = gridData.filter(slot => slot !== null);
+      // Se tem mais de 3 animais ou algum animal que não seja formiga (nível 0)
+      if (nonNullSlots.length > 3 || nonNullSlots.some(level => level > 0)) {
+        hasRealProgress = true;
+      }
+    }
+    
+    // Verificar botões desbloqueados (além da formiga padrão)
+    if (savedUnlocked) {
+      const unlockedData = JSON.parse(savedUnlocked);
+      // Se tem mais botões desbloqueados além da formiga (índice 0)
+      if (unlockedData.length > 1 || !unlockedData.includes(0)) {
+        hasRealProgress = true;
+      }
+    }
+    
+    // Verificar tutorial (se já fez algum merge)
+    if (savedTutorial) {
+      const tutorialData = JSON.parse(savedTutorial);
+      if (tutorialData.length > 0) {
+        hasRealProgress = true;
+      }
+    }
+    
+    return hasRealProgress;
+  } catch (error) {
+    console.log('Erro ao verificar jogo salvo:', error);
+    return false;
+  }
+}
+
+function showLoadGamePopup() {
+  const popupDiv = document.createElement('div');
+  popupDiv.className = 'restart-popup';
+  
+  popupDiv.innerHTML = `
+    <div style="font-size: 1.3em; margin-bottom: 15px;">💾 JOGO SALVO ENCONTRADO 💾</div>
+    <div style="margin-bottom: 20px; line-height: 1.4;">
+      Foi encontrado um progresso salvo. O que deseja fazer?
+    </div>
+    <div class="restart-popup-buttons">
+      <button class="restart-popup-button keep" onclick="loadSavedGame()">
+        📂 Continuar Jogo<br>
+        <small style="font-size: 0.8em;">Carregar progresso salvo</small>
+      </button>
+      <button class="restart-popup-button reset" onclick="startFreshGame()">
+        🆕 Novo Jogo<br>
+        <small style="font-size: 0.8em;">Começar do zero</small>
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(popupDiv);
+}
+
+function loadSavedGame() {
+  // Remove popup
+  const popup = document.querySelector('.restart-popup');
+  if (popup) popup.remove();
+  
+  // Carregar dados salvos
+  moedas = loadMoedasFromCache() || 1000;
+  tutorialMerges = loadTutorialFromCache() || new Set();
+  unlockedButtons = loadUnlockedButtonsFromCache() || new Set([0]);
+  
+  // Inicializar o jogo normalmente (vai carregar o grid salvo)
+  initGrid();
+  updateMoedas();
+  updateButtonVisibility();
+  
+  // Mostrar informações do jogo carregado
+  const currentPower = calculateBattlePower();
+  const totalAnimals = grid.filter(slot => slot !== null).length;
+  const unlockedCount = unlockedButtons.size;
+  
+  logMessage('💾 Jogo carregado com sucesso!');
+  logMessage(`Moedas: ${moedas} | Animais: ${totalAnimals} | Poder: ${currentPower}`);
+  logMessage(`Animais desbloqueados: ${unlockedCount}/20`);
+}
+
+function startFreshGame() {
+  // Remove popup
+  const popup = document.querySelector('.restart-popup');
+  if (popup) popup.remove();
+  
+  // Limpar cache
+  clearCache();
+  
+  // Resetar variáveis
+  moedas = 1000;
+  tutorialMerges = new Set();
+  unlockedButtons = new Set([0]);
+  grid = Array(40).fill(null);
+  
+  // Inicializar novo jogo
+  initGrid();
+  updateMoedas();
+  updateButtonVisibility();
+  
+  const initialPower = calculateBattlePower();
+  logMessage('🆕 Novo jogo iniciado!');
+  logMessage(`Poder inicial: ${initialPower}`);
+}
+
+function showMergeTutorial(fromLevel, toLevel) {
+  // Verifica se já mostrou este tutorial antes
+  if (tutorialMerges.has(toLevel)) {
+    return; // Já mostrou, não mostrar novamente
+  }
+  
+  // Marcar como mostrado e salvar
+  tutorialMerges.add(toLevel);
+  saveTutorialToCache();
+  
+  // Desbloquear o botão do próximo nível se existir
+  if (toLevel < geminiLevels.length - 1) {
+    unlockedButtons.add(toLevel);
+    saveUnlockedButtonsToCache();
+    updateButtonVisibility();
+  }
+  
+  // Criar e mostrar a mensagem
+  const tutorialDiv = document.createElement('div');
+  tutorialDiv.className = 'merge-tutorial';
+  
+  const fromAnimal = geminiLevels[fromLevel];
+  const toAnimal = geminiLevels[toLevel];
+  const animalName = mergeNames[toLevel - 1]; // -1 porque o array começa do índice 0
+  
+  tutorialDiv.innerHTML = `
+    <div style="font-size: 1.2em; margin-bottom: 10px;">🎉 PRIMEIRO MERGE! 🎉</div>
+    <div>${fromAnimal} + ${fromAnimal} = ${toAnimal}</div>
+    <div style="margin-top: 10px; font-size: 1.1em;">Você criou: ${animalName}!</div>
+    ${toLevel < geminiLevels.length - 1 ? '<div style="margin-top: 8px; font-size: 0.9em; color: #FFD700;">🔓 Novo animal desbloqueado!</div>' : ''}
+  `;
+  
+  document.body.appendChild(tutorialDiv);
+  
+  // Remover após 4 segundos
+  setTimeout(() => {
+    if (tutorialDiv.parentNode) {
+      tutorialDiv.parentNode.removeChild(tutorialDiv);
+    }
+  }, 7000);
+}
+
+function updateButtonVisibility() {
+  const buttons = [
+    buy1Btn, buy2Btn, buy3Btn, buy4Btn, buy5Btn, buy6Btn, buy7Btn, buy8Btn, buy9Btn, buy10Btn,
+    buy11Btn, buy12Btn, buy13Btn, buy14Btn, buy15Btn, buy16Btn, buy17Btn, buy18Btn, buy19Btn, buy20Btn
+  ];
+  
+  buttons.forEach((button, index) => {
+    if (unlockedButtons.has(index)) {
+      button.classList.remove('hidden');
+      button.style.display = 'block'; // Sobrescreve o CSS para mostrar o botão
+    } else {
+      button.classList.add('hidden');
+      button.style.display = 'none'; // Mantém oculto
+    }
+  });
 }
 
 function updateMoedas() {
@@ -63,6 +325,12 @@ function updateMoedas() {
   
   // Salvar moedas no cache automaticamente
   saveMoedasToCache();
+  
+  // Salvar grid no cache automaticamente
+  saveGridToCache();
+  
+  // Atualizar visibilidade dos botões
+  updateButtonVisibility();
   
   const emptySlots = grid.filter(slot => slot === null).length;
   
@@ -77,6 +345,16 @@ function updateMoedas() {
   buy8Btn.disabled = moedas < buyCosts[7] || emptySlots < 1; // 🐟 (12800)
   buy9Btn.disabled = moedas < buyCosts[8] || emptySlots < 1; // 🐱 (25600)
   buy10Btn.disabled = moedas < buyCosts[9] || emptySlots < 1; // 🐶 (51200)
+  buy11Btn.disabled = moedas < buyCosts[10] || emptySlots < 1; // 🦁 (102400
+  buy12Btn.disabled = moedas < buyCosts[11] || emptySlots < 1; // 🐅 (204800)
+  buy13Btn.disabled = moedas < buyCosts[12] || emptySlots < 1; // 🐻 (409600)
+  buy14Btn.disabled = moedas < buyCosts[13] || emptySlots < 1; // 🐘 (819200)
+  buy15Btn.disabled = moedas < buyCosts[14] || emptySlots < 1; // 🦒 (1638400)
+  buy16Btn.disabled = moedas < buyCosts[15] || emptySlots < 1; // 🦓 (3276800)
+  buy17Btn.disabled = moedas < buyCosts[16] || emptySlots < 1; // 🦛 (6553600)
+  buy18Btn.disabled = moedas < buyCosts[17] || emptySlots < 1; // 🦏 (13107200)
+  buy19Btn.disabled = moedas < buyCosts[18] || emptySlots < 1; // 🐴 (26214400)
+  buy20Btn.disabled = moedas < buyCosts[19] || emptySlots < 1; // 🐉 (52428800)
 }
 
 function getGeminiColor(level) {
@@ -107,10 +385,14 @@ function selectGemini(gemini) {
     const index2 = parseInt(gemini.dataset.index);
     
     if (selectedGemini.dataset.level === gemini.dataset.level) {
-      const newLevel = parseInt(selectedGemini.dataset.level) + 1;
+      const oldLevel = parseInt(selectedGemini.dataset.level);
+      const newLevel = oldLevel + 1;
       if (newLevel < geminiLevels.length) {
         grid[index1] = null;
         grid[index2] = newLevel;
+        
+        // Mostrar tutorial na primeira vez que este merge é feito
+        showMergeTutorial(oldLevel, newLevel);
         
         // Remove old geminis
         selectedGemini.remove();
@@ -162,6 +444,9 @@ function buyGemini(cost, level, quantity, geminiName) {
   
   updateMoedas();
   
+  // Salvar grid após compra
+  saveGridToCache();
+  
   // Atualizar log com novo poder
   const newPower = calculateBattlePower();
   logMessage(`${geminiName} comprado! Novo poder: ${newPower}`);
@@ -178,6 +463,16 @@ function buy7Sapo() { buyGemini(buyCosts[6], 6, 1, geminiLevels[6]); } // 🐸 (
 function buy8Fish() { buyGemini(buyCosts[7], 7, 1, geminiLevels[7]); } // 🐟 (12800)
 function buy9Cat() { buyGemini(buyCosts[8], 8, 1, geminiLevels[8]); } // 🐱 (25600)
 function buy10Dog() { buyGemini(buyCosts[9], 9, 1, geminiLevels[9]); } // 🐶 (51200)
+function buy11Lion() { buyGemini(buyCosts[10], 10, 1, geminiLevels[10]); } // 🦁 (102400)
+function buy12Tiger() { buyGemini(buyCosts[11], 11, 1, geminiLevels[11]); } // 🐅 (204800)
+function buy13Bear() { buyGemini(buyCosts[12], 12, 1, geminiLevels[12]); } // 🐻 (409600)
+function buy14Elephant() { buyGemini(buyCosts[13], 13, 1, geminiLevels[13]); } // 🐘 (819200)
+function buy15Giraffe() { buyGemini(buyCosts[14], 14, 1, geminiLevels[14]); } // 🦒 (1638400)
+function buy16Zebra() { buyGemini(buyCosts[15], 15, 1, geminiLevels[15]); } // 🦓 (3276800)
+function buy17Hippo() { buyGemini(buyCosts[16], 16, 1, geminiLevels[16]); } // 🦛 (6553600)
+function buy18Rhino() { buyGemini(buyCosts[17], 17, 1, geminiLevels[17]); } // 🦏 (13107200)
+function buy19Horse() { buyGemini(buyCosts[18], 18, 1, geminiLevels[18]); } // 🐴 (26214400)
+function buy20Dragon() { buyGemini(buyCosts[19], 19, 1, geminiLevels[19]); } // 🐉 (52428800)
 
 function logMessage(message) {
   const logMessages = document.getElementById('logMessages');
@@ -235,35 +530,137 @@ function initGrid() {
     gridEl.appendChild(slot);
   }
   
-  // Adicionar 3 geminis iniciais
-  for (let i = 0; i < 3; i++) {
-    const randomIndex = Math.floor(Math.random() * 40);
-    if (grid[randomIndex] === null) {
+  // Tentar carregar grid salvo
+  const savedGrid = loadGridFromCache();
+  if (savedGrid && savedGrid.some(slot => slot !== null)) {
+    // Há um grid salvo com animais
+    grid = savedGrid;
+    
+    // Recriar os geminis baseado no grid salvo
+    for (let i = 0; i < grid.length; i++) {
+      if (grid[i] !== null) {
+        const gemini = createGemini(grid[i], i);
+        gridEl.children[i].appendChild(gemini);
+      }
+    }
+  } else {
+    // Não há grid salvo ou está vazio, criar 3 geminis iniciais
+    for (let i = 0; i < 3; i++) {
+      const randomIndex = Math.floor(Math.random() * 40);
+      if (grid[randomIndex] === null) {
+        grid[randomIndex] = 0;
+        const gemini = createGemini(0, randomIndex);
+        gridEl.children[randomIndex].appendChild(gemini);
+      }
+    }
+    
+    // Salvar o grid inicial
+    saveGridToCache();
+  }
+}
+
+function restartGame() {
+  // Criar popup visual elegante
+  const popupDiv = document.createElement('div');
+  popupDiv.className = 'restart-popup';
+  
+  popupDiv.innerHTML = `
+    <div style="font-size: 1.3em; margin-bottom: 15px;">🔄 REINICIAR JOGO 🔄</div>
+    <div style="margin-bottom: 20px; line-height: 1.4;">
+      Escolha como deseja reiniciar o jogo:
+    </div>
+    <div class="restart-popup-buttons">
+      <button class="restart-popup-button keep" onclick="restartKeepProgress()">
+        🎯 Manter Progresso<br>
+        <small style="font-size: 0.8em;">Manter moedas e desbloqueios</small>
+      </button>
+      <button class="restart-popup-button reset" onclick="restartFullReset()">
+        🔥 Reset Completo<br>
+        <small style="font-size: 0.8em;">Limpar tudo e começar do zero</small>
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(popupDiv);
+}
+
+function restartKeepProgress() {
+  // Remove popup
+  const popup = document.querySelector('.restart-popup');
+  if (popup) popup.remove();
+  
+  // Salvar o estado atual do grid antes de reiniciar
+  saveGridToCache();
+  
+  // Limpar seleção atual
+  selectedGemini = null;
+  if (selectedGemini) {
+    selectedGemini.style.outline = '';
+  }
+  
+  // Clear and reinitialize the grid
+  gridEl.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.dataset.index = i;
+    gridEl.appendChild(slot);
+  }
+  
+  // Restaurar os animais que estavam no grid
+  const savedGrid = loadGridFromCache();
+  if (savedGrid) {
+    grid = savedGrid;
+    
+    // Recriar os geminis baseado no grid salvo
+    for (let i = 0; i < grid.length; i++) {
+      if (grid[i] !== null) {
+        const gemini = createGemini(grid[i], i);
+        gridEl.children[i].appendChild(gemini);
+      }
+    }
+    
+    logMessage(`Grid restaurado! Animais preservados.`);
+  } else {
+    // Se não há grid salvo, criar 3 formigas iniciais
+    grid = Array(40).fill(null);
+    for (let i = 0; i < 3; i++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * 40);
+      } while (grid[randomIndex] !== null);
       grid[randomIndex] = 0;
       const gemini = createGemini(0, randomIndex);
       gridEl.children[randomIndex].appendChild(gemini);
     }
+    
+    logMessage(`Grid reiniciado! Progresso mantido.`);
   }
   
-  // Mostrar poder inicial da batalha
-  const initialPower = calculateBattlePower();
-  logMessage(`Poder inicial da batalha: ${initialPower}`);
+  // Clear the log (manter apenas a mensagem de restauração)
+  const currentLog = logMessages.innerHTML;
+  logMessages.innerHTML = '';
+  logMessage(savedGrid ? 'Grid restaurado! Animais preservados.' : 'Grid reiniciado! Progresso mantido.');
+  
+  // Mostrar poder de batalha atual
+  const restartPower = calculateBattlePower();
+  logMessage(`Poder atual: ${restartPower}`);
+  
+  updateMoedas();
 }
 
-function restartGame() {
-  // Perguntar se o usuário quer manter as moedas salvas
-  const keepMoedas = confirm('Deseja manter suas moedas salvas? (Cancelar = resetar para 1000 moedas)');
+function restartFullReset() {
+  // Remove popup
+  const popup = document.querySelector('.restart-popup');
+  if (popup) popup.remove();
   
-  if (!keepMoedas) {
-    moedas = 1000;
-    // Limpar cache se escolher resetar
-    try {
-      localStorage.removeItem('mergeAnimals_moedas');
-    } catch (error) {
-      console.log('Erro ao limpar cache:', error);
-    }
-  }
+  // Reset completo - limpar todo o localStorage
+  clearCache();
   
+  // Resetar todas as variáveis para o estado inicial
+  moedas = 1000;
+  tutorialMerges = new Set();
+  unlockedButtons = new Set([0]); // Só formiga liberada
   selectedGemini = null;
   grid = Array(40).fill(null);
   
@@ -297,7 +694,7 @@ function restartGame() {
   
   // Mostrar poder de batalha após reiniciar
   const restartPower = calculateBattlePower();
-  logMessage(`Jogo reiniciado! Poder inicial: ${restartPower}`);
+  logMessage(`Reset completo realizado! Poder inicial: ${restartPower}`);
   
   updateMoedas();
 }
@@ -313,16 +710,29 @@ buy7Btn.addEventListener('click', buy7Sapo);
 buy8Btn.addEventListener('click', buy8Fish);
 buy9Btn.addEventListener('click', buy9Cat); 
 buy10Btn.addEventListener('click', buy10Dog);
+buy11Btn.addEventListener('click', buy11Lion);
+buy12Btn.addEventListener('click', buy12Tiger);
+buy13Btn.addEventListener('click', buy13Bear);
+buy14Btn.addEventListener('click', buy14Elephant);
+buy15Btn.addEventListener('click', buy15Giraffe);
+buy16Btn.addEventListener('click', buy16Zebra);
+buy17Btn.addEventListener('click', buy17Hippo);
+buy18Btn.addEventListener('click', buy18Rhino);
+buy19Btn.addEventListener('click', buy19Horse);
+buy20Btn.addEventListener('click', buy20Dragon);
+
 battleBtn.addEventListener('click', startBattle);
 restartBtn.addEventListener('click', restartGame);
 
 // Inicializar
-initGrid();
-updateMoedas();
-
-// Mostrar mensagem se moedas foram carregadas do cache
-if (loadMoedasFromCache()) {
-  logMessage(`Moedas carregadas do cache: ${moedas}`);
+// Verificar se há jogo salvo antes de inicializar
+if (hasSavedGame()) {
+  // Há dados salvos, mostrar popup para escolher
+  showLoadGamePopup();
 } else {
+  // Não há dados salvos, inicializar normalmente
+  initGrid();
+  updateMoedas();
+  updateButtonVisibility();
   logMessage('Novo jogo iniciado!');
 }
