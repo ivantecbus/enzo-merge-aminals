@@ -37,58 +37,46 @@ body {
   text-align: center;
 }
 
-/* Grid responsivo: 5x8 em portrait, 8x5 em landscape - mantém 40 slots totais */
+/* Grid responsivo dinâmico - se adapta ao tamanho da tela */
 #grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: clamp(1px, 0.6vw, 4px); /* Gap reduzido */
+  gap: clamp(2px, 0.8vw, 6px);
   margin-bottom: clamp(8px, 2vh, 15px);
-  aspect-ratio: 5/8; /* Padrão para orientação vertical */
-  width: min(92vw, 500px); /* Largura mais adaptável */
-  max-height: 70vh; /* Altura ajustada */
+  width: min(95vw, 800px);
+  max-height: 70vh;
   justify-content: center;
+  align-items: center;
   touch-action: manipulation;
   -webkit-touch-callout: none;
   box-sizing: border-box;
-  padding: clamp(2px, 0.8vw, 6px); /* Padding mais flexível */
-  border: 1px solid #333; /* Borda para melhor visualização dos limites */
+  padding: clamp(3px, 1vw, 8px);
+  border: 1px solid #333;
+  border-radius: clamp(4px, 1vw, 12px);
+  /* Grid será definido dinamicamente via JavaScript */
 }
 
-/* Grid horizontal para orientação landscape */
-@media (orientation: landscape) {
-  #grid {
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    aspect-ratio: 8/5; /* Proporção invertida para landscape */
-    width: min(85vw, 700px); /* Largura maior para aproveitar o espaço horizontal */
-    max-height: 60vh;
-    gap: clamp(1px, 0.5vw, 3px); /* Gap reduzido para landscape */
-  }
-}
 .slot {
   aspect-ratio: 1;
   background: #444;
-  border-radius: clamp(3px, 0.8vw, 8px); /* Border radius mais flexível */
+  border-radius: clamp(3px, 1vw, 8px);
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   position: relative;
-  min-width: clamp(25px, 7vw, 80px); /* Tamanho mais flexível */
-  min-height: clamp(25px, 7vw, 80px);
-  max-width: clamp(25px, 7vw, 80px); /* Limita tamanho máximo */
-  max-height: clamp(25px, 7vw, 80px);
   touch-action: manipulation;
   -webkit-touch-callout: none;
   box-sizing: border-box;
-  overflow: hidden; /* Garante que o conteúdo não saia do slot */
+  overflow: hidden;
+  min-width: 30px;
+  min-height: 30px;
+  /* Tamanho será calculado dinamicamente */
 }
 
 .gemini {
-  width: 92%; /* Ajustado para melhor proporção */
-  height: 92%;
-  border-radius: clamp(3px, 0.8vw, 8px);
+  width: 90%;
+  height: 90%;
+  border-radius: clamp(3px, 1vw, 8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -98,308 +86,15 @@ body {
   user-select: none;
   cursor: grab;
   position: absolute;
-  top: 4%; /* Centralizado com margem */
-  left: 4%;
-  font-size: clamp(10px, 4vw, 32px); /* Tamanho de fonte mais flexível */
-  object-fit: cover;
+  top: 5%;
+  left: 5%;
+  font-size: clamp(12px, 3vw, 28px);
   box-sizing: border-box;
-  overflow: hidden; /* Garante que o emoji não saia do container */
-  line-height: 1; /* Evita problemas de linha */
+  overflow: hidden;
+  line-height: 1;
 }
 
-/* Responsividade para tablets em modo retrato */
-@media (max-width: 768px) and (orientation: portrait) {
-  #grid {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    aspect-ratio: 5/8;
-    width: min(88vw, 420px);
-    max-height: 65vh;
-    gap: clamp(1px, 0.5vw, 3px); /* Gap reduzido */
-    padding: clamp(2px, 0.6vw, 4px);
-  }
-  
-  .slot {
-    min-width: clamp(22px, 6vw, 60px);
-    min-height: clamp(22px, 6vw, 60px);
-    max-width: clamp(22px, 6vw, 60px);
-    max-height: clamp(22px, 6vw, 60px);
-  }
-  
-  .gemini {
-    font-size: clamp(8px, 3.5vw, 26px);
-  }
-  
-  button {
-    font-size: clamp(10px, 3vw, 14px);
-    min-width: clamp(50px, 12vw, 80px);
-    padding: clamp(6px, 1.5vh, 10px) clamp(8px, 2vw, 15px);
-  }
-}
 
-/* Responsividade para tablets em modo paisagem */
-@media (max-width: 1024px) and (orientation: landscape) {
-  #grid {
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    aspect-ratio: 8/5;
-    width: min(85vw, 650px);
-    max-height: 65vh;
-    gap: clamp(1px, 0.6vw, 4px); /* Gap reduzido */
-    padding: clamp(3px, 0.8vw, 6px);
-  }
-  
-  .slot {
-    min-width: clamp(25px, 4.5vw, 55px);
-    min-height: clamp(25px, 4.5vw, 55px);
-    max-width: clamp(25px, 4.5vw, 55px);
-    max-height: clamp(25px, 4.5vw, 55px);
-  }
-  
-  .gemini {
-    font-size: clamp(12px, 3vw, 26px);
-  }
-  
-  button {
-    font-size: clamp(11px, 2.8vw, 15px);
-    min-width: clamp(60px, 9vw, 90px);
-    padding: clamp(7px, 1.5vh, 12px) clamp(10px, 2vw, 18px);
-  }
-}
-
-/* Responsividade para smartphones */
-@media (max-width: 480px) and (orientation: portrait) {
-  #grid {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    aspect-ratio: 5/8;
-    width: min(82vw, 350px);
-    max-height: 50vh;
-    gap: clamp(1px, 0.3vw, 2px);
-    padding: clamp(1px, 0.2vw, 2px);
-  }
-  
-  .slot {
-    min-width: clamp(16px, 4.8vw, 45px);
-    min-height: clamp(16px, 4.8vw, 45px);
-    max-width: clamp(16px, 4.8vw, 45px);
-    max-height: clamp(16px, 4.8vw, 45px);
-  }
-  
-  .gemini {
-    font-size: clamp(5px, 2.5vw, 20px);
-    width: 85%;
-    height: 85%;
-    top: 7.5%;
-    left: 7.5%;
-  }
-  
-  #controls {
-    gap: clamp(2px, 0.6vw, 5px);
-    padding: 0 3px;
-  }
-  
-  button {
-    font-size: clamp(7px, 2.2vw, 11px);
-    min-width: clamp(40px, 9vw, 65px);
-    padding: clamp(3px, 0.8vh, 7px) clamp(5px, 1.2vw, 10px);
-    margin: clamp(1px, 0.2vw, 2px);
-  }
-  
-  #moedas {
-    font-size: clamp(0.9em, 4vw, 1.3em);
-  }
-}
-
-/* Smartphones em modo paisagem */
-@media (max-width: 480px) and (orientation: landscape) {
-  #grid {
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    aspect-ratio: 8/5;
-    width: min(88vw, 480px);
-    max-height: 45vh;
-    gap: clamp(1px, 0.2vw, 2px); /* Gap muito reduzido */
-    padding: clamp(1px, 0.3vw, 2px);
-  }
-  
-  .slot {
-    min-width: clamp(14px, 3.8vw, 35px);
-    min-height: clamp(14px, 3.8vw, 35px);
-    max-width: clamp(14px, 3.8vw, 35px);
-    max-height: clamp(14px, 3.8vw, 35px);
-  }
-  
-  .gemini {
-    font-size: clamp(4px, 2vw, 16px);
-    width: 85%;
-    height: 85%;
-    top: 7.5%;
-    left: 7.5%;
-  }
-}
-
-/* Responsividade para smartphones muito pequenos */
-@media (max-width: 320px) and (orientation: portrait) {
-  #grid {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    aspect-ratio: 5/8;
-    width: min(82vw, 280px);
-    max-height: 50vh;
-    gap: clamp(1px, 0.3vw, 2px);
-    padding: clamp(1px, 0.2vw, 2px);
-  }
-  
-  .slot {
-    min-width: clamp(16px, 5vw, 45px);
-    min-height: clamp(16px, 5vw, 45px);
-    max-width: clamp(16px, 5vw, 45px);
-    max-height: clamp(16px, 5vw, 45px);
-  }
-  
-  .gemini {
-    font-size: clamp(5px, 2.8vw, 20px);
-  }
-  
-  body {
-    padding: clamp(3px, 1vw, 8px);
-  }
-  
-  button {
-    font-size: clamp(7px, 2.8vw, 10px);
-    min-width: clamp(40px, 9vw, 60px);
-    padding: clamp(3px, 0.8vh, 6px) clamp(5px, 1.2vw, 8px);
-    margin: clamp(0.5px, 0.2vw, 2px);
-  }
-  
-  #controls {
-    gap: clamp(2px, 0.5vw, 4px);
-  }
-  
-  #moedas {
-    font-size: clamp(0.9em, 4vw, 1.2em);
-  }
-}
-
-/* Smartphones muito pequenos em modo paisagem */
-@media (max-width: 320px) and (orientation: landscape) {
-  #grid {
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    aspect-ratio: 8/5;
-    width: min(90vw, 320px);
-    max-height: 40vh;
-    gap: clamp(0.5px, 0.1vw, 1px); /* Gap mínimo */
-    padding: clamp(1px, 0.1vw, 1px);
-  }
-  
-  .slot {
-    min-width: clamp(12px, 3.5vw, 25px);
-    min-height: clamp(12px, 3.5vw, 25px);
-    max-width: clamp(12px, 3.5vw, 25px);
-    max-height: clamp(12px, 3.5vw, 25px);
-  }
-  
-  .gemini {
-    font-size: clamp(3px, 1.5vw, 12px);
-  }
-}
-
-/* Otimização específica para dispositivos médios (como 810x990) */
-@media (max-width: 850px) and (min-width: 769px) {
-  #grid {
-    width: min(85vw, 450px);
-    max-height: 60vh;
-    gap: clamp(1px, 0.5vw, 3px); /* Gap reduzido */
-    padding: clamp(2px, 0.6vw, 4px);
-  }
-  
-  .slot {
-    min-width: clamp(20px, 5.5vw, 55px);
-    min-height: clamp(20px, 5.5vw, 55px);
-    max-width: clamp(20px, 5.5vw, 55px);
-    max-height: clamp(20px, 5.5vw, 55px);
-  }
-  
-  .gemini {
-    font-size: clamp(8px, 3.2vw, 24px);
-    width: 90%;
-    height: 90%;
-    top: 5%;
-    left: 5%;
-  }
-  
-  button {
-    font-size: clamp(9px, 2.6vw, 13px);
-    min-width: clamp(50px, 10vw, 75px);
-    padding: clamp(6px, 1.2vh, 10px) clamp(8px, 1.8vw, 14px);
-  }
-  
-  #controls {
-    gap: clamp(4px, 1vw, 8px);
-    padding: clamp(3px, 0.8vw, 8px);
-  }
-}
-
-/* Media query para telas grandes (desktop) */
-@media (min-width: 1025px) and (orientation: portrait) {
-  #grid {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    aspect-ratio: 5/8;
-    width: min(60vw, 500px);
-    max-height: 75vh;
-    gap: clamp(2px, 0.8vw, 6px); /* Gap reduzido */
-    padding: clamp(4px, 1vw, 8px);
-  }
-  
-  .slot {
-    min-width: clamp(35px, 5vw, 65px);
-    min-height: clamp(35px, 5vw, 65px);
-    max-width: clamp(35px, 5vw, 65px);
-    max-height: clamp(35px, 5vw, 65px);
-  }
-  
-  .gemini {
-    font-size: clamp(14px, 2.5vw, 32px);
-  }
-  
-  button {
-    font-size: clamp(12px, 1.8vw, 16px);
-    min-width: clamp(70px, 8vw, 120px);
-    padding: clamp(8px, 1.5vh, 14px) clamp(12px, 2vw, 24px);
-  }
-  
-  #controls {
-    gap: clamp(8px, 1.5vw, 15px);
-    padding: 0 15px;
-  }
-}
-
-/* Desktop em modo paisagem */
-@media (min-width: 1025px) and (orientation: landscape) {
-  #grid {
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    aspect-ratio: 8/5;
-    width: min(80vw, 800px);
-    max-height: 70vh;
-    gap: clamp(2px, 0.8vw, 6px); /* Gap reduzido */
-    padding: clamp(4px, 1vw, 8px);
-  }
-  
-  .slot {
-    min-width: clamp(30px, 4vw, 60px);
-    min-height: clamp(30px, 4vw, 60px);
-    max-width: clamp(30px, 4vw, 60px);
-    max-height: clamp(30px, 4vw, 60px);
-  }
-  
-  .gemini {
-    font-size: clamp(12px, 2.2vw, 28px);
-  }
-}
 
 /* Estilos para o log area */
 #logArea {

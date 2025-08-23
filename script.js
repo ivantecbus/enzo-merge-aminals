@@ -26,7 +26,8 @@ const logMessages = document.getElementById('logMessages');
 
 let moedas = loadMoedasFromCache() || 1000;
 let selectedGemini = null;
-let grid = Array(40).fill(null);
+let grid = Array(40).fill(null); // Será redimensionado dinamicamente
+let gridSize = { cols: 5, rows: 8, total: 40 }; // Configuração inicial
 let geminiLevels = ['🐜', '🐛', '🦂', '🕷️', '🐍', '🦎', '🐸', '🐟', '🐱', '🐶', '🦁', '🐅', '🐻', '🐘', '🦒', '🦓', '🦛', '🦏', '🐴', '🐉'];
 
 // Sistema de tutorial - controla quais merges já foram feitos
@@ -45,6 +46,124 @@ const mergeNames = [
 
 // Custos progressivos (duplicando a cada nível)
 const buyCosts = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800, 409600, 819200, 1638400, 3276800, 6553600, 13107200, 26214400, 52428800];
+
+// Função para calcular grid responsivo baseado no tamanho da tela
+function calculateResponsiveGrid() {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const isLandscape = screenWidth > screenHeight;
+  
+  // Tamanho ideal dos slots baseado no tamanho da tela
+  let slotSize;
+  if (screenWidth <= 480) {
+    slotSize = 35; // Tela pequena (celular)
+  } else if (screenWidth <= 768) {
+    slotSize = 45; // Tela média (tablet)
+  } else if (screenWidth <= 1200) {
+    slotSize = 55; // Tela grande (desktop)
+  } else {
+    slotSize = 65; // Tela muito grande
+  }
+  
+  // Calcular área disponível (deixando margem para botões e interface)
+  const availableWidth = screenWidth * 0.85;
+  const availableHeight = screenHeight * 0.60;
+  
+  // Calcular quantos slots cabem considerando gaps
+  const gap = 5;
+  const cols = Math.floor(availableWidth / (slotSize + gap));
+  const rows = Math.floor(availableHeight / (slotSize + gap));
+  
+  // Aplicar limites mínimos e máximos mais flexíveis
+  const minCols = 3, maxCols = 20;
+  const minRows = 3, maxRows = 15;
+  
+  const finalCols = Math.min(Math.max(cols, minCols), maxCols);
+  const finalRows = Math.min(Math.max(rows, minRows), maxRows);
+  const total = finalCols * finalRows;
+  
+  // Garantir um mínimo absoluto de 12 slots
+  if (total < 12) {
+    return {
+      cols: 4,
+      rows: 3,
+      total: 12
+    };
+  }
+  
+  return {
+    cols: finalCols,
+    rows: finalRows,
+    total: total
+  };
+}
+
+// Função para aplicar o grid responsivo
+function applyResponsiveGrid() {
+  const newGridSize = calculateResponsiveGrid();
+  
+  // Calcular tamanho dos slots baseado na área disponível
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const availableWidth = screenWidth * 0.85;
+  const availableHeight = screenHeight * 0.60;
+  const gap = 5;
+  
+  const slotWidth = Math.floor((availableWidth - (newGridSize.cols - 1) * gap) / newGridSize.cols);
+  const slotHeight = Math.floor((availableHeight - (newGridSize.rows - 1) * gap) / newGridSize.rows);
+  const slotSize = Math.min(slotWidth, slotHeight);
+  
+  // Se o tamanho mudou, ajustar arrays e recriar elementos
+  if (newGridSize.total !== gridSize.total) {
+    const oldGrid = [...grid];
+    const oldSize = gridSize.total;
+    
+    // Salvar animais existentes
+    const existingAnimals = [];
+    for (let i = 0; i < oldGrid.length; i++) {
+      if (oldGrid[i] !== null) {
+        existingAnimals.push(oldGrid[i]);
+      }
+    }
+    
+    // Atualizar tamanho do grid
+    gridSize = newGridSize;
+    grid = Array(gridSize.total).fill(null);
+    
+    // Aplicar CSS dinâmico
+    const gridEl = document.getElementById('grid');
+    gridEl.style.gridTemplateColumns = `repeat(${gridSize.cols}, ${slotSize}px)`;
+    gridEl.style.gridTemplateRows = `repeat(${gridSize.rows}, ${slotSize}px)`;
+    gridEl.style.gap = `${gap}px`;
+    
+    // IMPORTANTE: Recriar todos os elementos slot fisicamente
+    gridEl.innerHTML = '';
+    for (let i = 0; i < gridSize.total; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.dataset.index = i;
+      slot.style.width = `${slotSize}px`;
+      slot.style.height = `${slotSize}px`;
+      gridEl.appendChild(slot);
+    }
+    
+    // Recolocar animais no novo grid
+    let targetIndex = 0;
+    for (const animalLevel of existingAnimals) {
+      if (targetIndex < gridSize.total) {
+        grid[targetIndex] = animalLevel;
+        const gemini = createGemini(animalLevel, targetIndex);
+        gridEl.children[targetIndex].appendChild(gemini);
+        targetIndex++;
+      }
+    }
+    
+    console.log(`Grid redimensionado: ${gridSize.cols}x${gridSize.rows} = ${gridSize.total} slots`);
+    return true; // Indica que houve mudança
+  }
+  
+  return false; // Não houve mudança
+}
 
 // Cores para cada nível
 const colors = [
@@ -312,10 +431,8 @@ function updateButtonVisibility() {
   buttons.forEach((button, index) => {
     if (unlockedButtons.has(index)) {
       button.classList.remove('hidden');
-      button.style.display = 'block'; // Sobrescreve o CSS para mostrar o botão
     } else {
       button.classList.add('hidden');
-      button.style.display = 'none'; // Mantém oculto
     }
   });
 }
@@ -522,8 +639,11 @@ function startBattle() {
 }
 
 function initGrid() {
+  // Calcular e aplicar grid responsivo
+  applyResponsiveGrid();
+  
   gridEl.innerHTML = '';
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < gridSize.total; i++) {
     const slot = document.createElement('div');
     slot.className = 'slot';
     slot.dataset.index = i;
@@ -533,30 +653,39 @@ function initGrid() {
   // Tentar carregar grid salvo
   const savedGrid = loadGridFromCache();
   if (savedGrid && savedGrid.some(slot => slot !== null)) {
-    // Há um grid salvo com animais
-    grid = savedGrid;
+    // Migrar dados salvos para o novo tamanho de grid
+    const animalsToPlace = [];
+    for (let i = 0; i < savedGrid.length; i++) {
+      if (savedGrid[i] !== null) {
+        animalsToPlace.push(savedGrid[i]);
+      }
+    }
     
-    // Recriar os geminis baseado no grid salvo
-    for (let i = 0; i < grid.length; i++) {
-      if (grid[i] !== null) {
-        const gemini = createGemini(grid[i], i);
-        gridEl.children[i].appendChild(gemini);
+    // Colocar animais no novo grid
+    let targetIndex = 0;
+    for (const animalLevel of animalsToPlace) {
+      if (targetIndex < gridSize.total) {
+        grid[targetIndex] = animalLevel;
+        const gemini = createGemini(animalLevel, targetIndex);
+        gridEl.children[targetIndex].appendChild(gemini);
+        targetIndex++;
       }
     }
   } else {
-    // Não há grid salvo ou está vazio, criar 3 geminis iniciais
-    for (let i = 0; i < 3; i++) {
-      const randomIndex = Math.floor(Math.random() * 40);
+    // Criar 3 formigas iniciais
+    const initialAnimals = Math.min(3, Math.floor(gridSize.total * 0.1)); // 10% do grid ou 3, o que for menor
+    for (let i = 0; i < initialAnimals; i++) {
+      const randomIndex = Math.floor(Math.random() * gridSize.total);
       if (grid[randomIndex] === null) {
         grid[randomIndex] = 0;
         const gemini = createGemini(0, randomIndex);
         gridEl.children[randomIndex].appendChild(gemini);
       }
     }
-    
-    // Salvar o grid inicial
-    saveGridToCache();
   }
+  
+  // Salvar o grid inicial
+  saveGridToCache();
 }
 
 function restartGame() {
@@ -598,9 +727,12 @@ function restartKeepProgress() {
     selectedGemini.style.outline = '';
   }
   
+  // Recalcular grid responsivo
+  applyResponsiveGrid();
+  
   // Clear and reinitialize the grid
   gridEl.innerHTML = '';
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < gridSize.total; i++) {
     const slot = document.createElement('div');
     slot.className = 'slot';
     slot.dataset.index = i;
@@ -610,37 +742,50 @@ function restartKeepProgress() {
   // Restaurar os animais que estavam no grid
   const savedGrid = loadGridFromCache();
   if (savedGrid) {
-    grid = savedGrid;
-    
-    // Recriar os geminis baseado no grid salvo
-    for (let i = 0; i < grid.length; i++) {
-      if (grid[i] !== null) {
-        const gemini = createGemini(grid[i], i);
-        gridEl.children[i].appendChild(gemini);
+    // Migrar animais para o novo tamanho de grid
+    const animalsToPlace = [];
+    for (let i = 0; i < savedGrid.length; i++) {
+      if (savedGrid[i] !== null) {
+        animalsToPlace.push(savedGrid[i]);
       }
     }
     
-    logMessage(`Grid restaurado! Animais preservados.`);
+    // Recriar array do grid com novo tamanho
+    grid = Array(gridSize.total).fill(null);
+    
+    // Colocar animais no novo grid
+    let targetIndex = 0;
+    for (const animalLevel of animalsToPlace) {
+      if (targetIndex < gridSize.total) {
+        grid[targetIndex] = animalLevel;
+        const gemini = createGemini(animalLevel, targetIndex);
+        gridEl.children[targetIndex].appendChild(gemini);
+        targetIndex++;
+      }
+    }
+    
+    logMessage(`Grid restaurado! Animais preservados. (${gridSize.cols}x${gridSize.rows})`);
   } else {
     // Se não há grid salvo, criar 3 formigas iniciais
-    grid = Array(40).fill(null);
-    for (let i = 0; i < 3; i++) {
+    grid = Array(gridSize.total).fill(null);
+    const initialAnimals = Math.min(3, Math.floor(gridSize.total * 0.1));
+    for (let i = 0; i < initialAnimals; i++) {
       let randomIndex;
       do {
-        randomIndex = Math.floor(Math.random() * 40);
+        randomIndex = Math.floor(Math.random() * gridSize.total);
       } while (grid[randomIndex] !== null);
       grid[randomIndex] = 0;
       const gemini = createGemini(0, randomIndex);
       gridEl.children[randomIndex].appendChild(gemini);
     }
     
-    logMessage(`Grid reiniciado! Progresso mantido.`);
+    logMessage(`Grid reiniciado! Progresso mantido. (${gridSize.cols}x${gridSize.rows})`);
   }
   
   // Clear the log (manter apenas a mensagem de restauração)
   const currentLog = logMessages.innerHTML;
   logMessages.innerHTML = '';
-  logMessage(savedGrid ? 'Grid restaurado! Animais preservados.' : 'Grid reiniciado! Progresso mantido.');
+  logMessage(savedGrid ? `Grid restaurado! Animais preservados. (${gridSize.cols}x${gridSize.rows})` : `Grid reiniciado! Progresso mantido. (${gridSize.cols}x${gridSize.rows})`);
   
   // Mostrar poder de batalha atual
   const restartPower = calculateBattlePower();
@@ -657,12 +802,15 @@ function restartFullReset() {
   // Reset completo - limpar todo o localStorage
   clearCache();
   
+  // Recalcular grid responsivo
+  applyResponsiveGrid();
+  
   // Resetar todas as variáveis para o estado inicial
   moedas = 1000;
   tutorialMerges = new Set();
   unlockedButtons = new Set([0]); // Só formiga liberada
   selectedGemini = null;
-  grid = Array(40).fill(null);
+  grid = Array(gridSize.total).fill(null);
   
   // Clear any selected gemini styling
   if (selectedGemini) {
@@ -671,7 +819,7 @@ function restartFullReset() {
   
   // Clear and reinitialize the grid
   gridEl.innerHTML = '';
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < gridSize.total; i++) {
     const slot = document.createElement('div');
     slot.className = 'slot';
     slot.dataset.index = i;
@@ -681,11 +829,12 @@ function restartFullReset() {
   // Clear the log
   logMessages.innerHTML = '';
   
-  // Add exactly 3 initial "Formiga" geminis
-  for (let i = 0; i < 3; i++) {
+  // Add initial animals (scaled to grid size)
+  const initialAnimals = Math.min(3, Math.floor(gridSize.total * 0.1));
+  for (let i = 0; i < initialAnimals; i++) {
     let randomIndex;
     do {
-      randomIndex = Math.floor(Math.random() * 40);
+      randomIndex = Math.floor(Math.random() * gridSize.total);
     } while (grid[randomIndex] !== null);
     grid[randomIndex] = 0;
     const gemini = createGemini(0, randomIndex);
@@ -694,7 +843,7 @@ function restartFullReset() {
   
   // Mostrar poder de batalha após reiniciar
   const restartPower = calculateBattlePower();
-  logMessage(`Reset completo realizado! Poder inicial: ${restartPower}`);
+  logMessage(`Reset completo realizado! Grid: ${gridSize.cols}x${gridSize.rows} - Poder inicial: ${restartPower}`);
   
   updateMoedas();
 }
@@ -723,6 +872,21 @@ buy20Btn.addEventListener('click', buy20Dragon);
 
 battleBtn.addEventListener('click', startBattle);
 restartBtn.addEventListener('click', restartGame);
+
+// Event listener para redimensionar grid quando a tela muda
+window.addEventListener('resize', () => {
+  // Usar debounce para evitar muitas chamadas
+  clearTimeout(window.resizeTimer);
+  window.resizeTimer = setTimeout(() => {
+    const hasChanged = applyResponsiveGrid();
+    
+    if (hasChanged) {
+      // Salvar novo estado
+      saveGridToCache();
+      logMessage(`📐 Grid redimensionado: ${gridSize.cols}x${gridSize.rows} (${gridSize.total} slots)`);
+    }
+  }, 300); // 300ms debounce
+});
 
 // Inicializar
 // Verificar se há jogo salvo antes de inicializar
