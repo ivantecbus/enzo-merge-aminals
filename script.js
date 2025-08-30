@@ -308,6 +308,9 @@ function hasSavedGame() {
 }
 
 function showLoadGamePopup() {
+  updateButtonVisibility();
+  initGrid();
+  
   const popupDiv = document.createElement('div');
   popupDiv.className = 'restart-popup';
   
@@ -419,7 +422,7 @@ function showMergeTutorial(fromLevel, toLevel) {
     if (tutorialDiv.parentNode) {
       tutorialDiv.parentNode.removeChild(tutorialDiv);
     }
-  }, 7000);
+  }, 3000);
 }
 
 function updateButtonVisibility() {
@@ -486,7 +489,8 @@ function createGemini(level, index) {
   gemini.dataset.level = level;
   gemini.dataset.index = index;
   
-  gemini.addEventListener('click', () => selectGemini(gemini));
+  // Usar event delegation para evitar múltiplos listeners
+  // O listener será tratado no nível do grid
   return gemini;
 }
 
@@ -694,17 +698,17 @@ function restartGame() {
   popupDiv.className = 'restart-popup';
   
   popupDiv.innerHTML = `
-    <div style="font-size: 1.3em; margin-bottom: 15px;">🔄 REINICIAR JOGO 🔄</div>
+  
     <div style="margin-bottom: 20px; line-height: 1.4;">
-      Escolha como deseja reiniciar o jogo:
+      Você deseja reiniciar o jogo:
     </div>
     <div class="restart-popup-buttons">
       <button class="restart-popup-button keep" onclick="restartKeepProgress()">
-        🎯 Manter Progresso<br>
+        🎯 Não <br>
         <small style="font-size: 0.8em;">Manter moedas e desbloqueios</small>
       </button>
       <button class="restart-popup-button reset" onclick="restartFullReset()">
-        🔥 Reset Completo<br>
+        🔥 Sim <br>
         <small style="font-size: 0.8em;">Limpar tudo e começar do zero</small>
       </button>
     </div>
@@ -848,30 +852,33 @@ function restartFullReset() {
   updateMoedas();
 }
 
-// Event listeners
-buy1Btn.addEventListener('click', buy1Formiga);
-buy2Btn.addEventListener('click', buy2Lagarta);
-buy3Btn.addEventListener('click', buy3Escorpiao);
-buy4Btn.addEventListener('click', buy4Aranha);
-buy5Btn.addEventListener('click', buy5Cobra);
-buy6Btn.addEventListener('click', buy6Lagarto);
-buy7Btn.addEventListener('click', buy7Sapo);
-buy8Btn.addEventListener('click', buy8Fish);
-buy9Btn.addEventListener('click', buy9Cat); 
-buy10Btn.addEventListener('click', buy10Dog);
-buy11Btn.addEventListener('click', buy11Lion);
-buy12Btn.addEventListener('click', buy12Tiger);
-buy13Btn.addEventListener('click', buy13Bear);
-buy14Btn.addEventListener('click', buy14Elephant);
-buy15Btn.addEventListener('click', buy15Giraffe);
-buy16Btn.addEventListener('click', buy16Zebra);
-buy17Btn.addEventListener('click', buy17Hippo);
-buy18Btn.addEventListener('click', buy18Rhino);
-buy19Btn.addEventListener('click', buy19Horse);
-buy20Btn.addEventListener('click', buy20Dragon);
-
-battleBtn.addEventListener('click', startBattle);
-restartBtn.addEventListener('click', restartGame);
+// Event delegation para botões
+document.addEventListener('click', (event) => {
+  console.log('Event delegation triggered for:', event.target.id);
+  
+  if (event.target.id === 'buy1Btn') buy1Formiga();
+  if (event.target.id === 'buy2Btn') buy2Lagarta();
+  if (event.target.id === 'buy3Btn') buy3Escorpiao();
+  if (event.target.id === 'buy4Btn') buy4Aranha();
+  if (event.target.id === 'buy5Btn') buy5Cobra();
+  if (event.target.id === 'buy6Btn') buy6Lagarto();
+  if (event.target.id === 'buy7Btn') buy7Sapo();
+  if (event.target.id === 'buy8Btn') buy8Fish();
+  if (event.target.id === 'buy9Btn') buy9Cat();
+  if (event.target.id === 'buy10Btn') buy10Dog();
+  if (event.target.id === 'buy11Btn') buy11Lion();
+  if (event.target.id === 'buy12Btn') buy12Tiger();
+  if (event.target.id === 'buy13Btn') buy13Bear();
+  if (event.target.id === 'buy14Btn') buy14Elephant();
+  if (event.target.id === 'buy15Btn') buy15Giraffe();
+  if (event.target.id === 'buy16Btn') buy16Zebra();
+  if (event.target.id === 'buy17Btn') buy17Hippo();
+  if (event.target.id === 'buy18Btn') buy18Rhino();
+  if (event.target.id === 'buy19Btn') buy19Horse();
+  if (event.target.id === 'buy20Btn') buy20Dragon();
+  if (event.target.id === 'battleBtn') startBattle();
+  if (event.target.id === 'restartBtn') restartGame();
+});
 
 // Event listener para redimensionar grid quando a tela muda
 window.addEventListener('resize', () => {
@@ -886,6 +893,14 @@ window.addEventListener('resize', () => {
       logMessage(`📐 Grid redimensionado: ${gridSize.cols}x${gridSize.rows} (${gridSize.total} slots)`);
     }
   }, 300); // 300ms debounce
+});
+
+// Event delegation para cliques nos geminis
+gridEl.addEventListener('click', (event) => {
+  const gemini = event.target.closest('.gemini');
+  if (gemini) {
+    selectGemini(gemini);
+  }
 });
 
 // Inicializar
